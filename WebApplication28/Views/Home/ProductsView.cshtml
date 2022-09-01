@@ -1,0 +1,10 @@
+﻿
+@model List<WebApplication28.Models.Product>
+
+<h1>@ViewData["Title"]</h1>
+<ul>
+    @foreach (var item in Model)
+    {
+        <li>item.Title</li>
+    }
+</ul>

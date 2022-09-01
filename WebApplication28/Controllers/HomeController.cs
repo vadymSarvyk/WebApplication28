@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using AspNetCore.Unobtrusive.Ajax;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -43,19 +44,53 @@ namespace WebApplication28.Controllers
             return PhysicalFile(file_path, file_type, file_name);
         }
 
-        /*   public IActionResult Index()
-           {
-               return View();
-           }*/
-        public IActionResult Index(int age)
+        public IActionResult Index()
+        {
+            return View();
+        }
+        [HttpPost]
+        public IActionResult Index(string name)
+        {
+            if (string.IsNullOrEmpty(name))
+            {
+                return SweetAlert("Oops!", "Please enter your name.", "warning");
+            }
+
+            return SweetAlert($"Hello {name}", "Message returned from Server!", "success");
+        }
+        [HttpPost]
+        [AjaxOnly]
+        public IActionResult AjaxMethod(string name)
+        {
+            if (string.IsNullOrEmpty(name))
+            {
+                return SweetAlert("Oops!", "Please enter your name.", "warning");
+            }
+
+            return PartialView("ViewName", $"Hello {name} Message returned  Server! success" );
+        }
+        [HttpPost]
+        [AjaxOnly]
+        [ValidateAntiForgeryToken]
+        public IActionResult UploadFile(IFormFile file)
+        {
+            if (file == null)
+            {
+                return SweetAlert("Oops!", "Please select a file for upload.", "warning");
+            }
+
+            return SweetAlert("Upload Success", $"File: {file.FileName} - Size: {file.Length} Bytes", "success");
+        }
+       /* public IActionResult Index(int age)
         {
             if (age < 18)
                 return Unauthorized(new Error { Message = "параметр age содержит недействительное значение" });
             return View("Index");
-        }
+        }*/
         [HttpGet]
         public IActionResult AddFile()
         {
+           
             return View("AddFile");
         }
         [HttpPost]
@@ -79,7 +114,17 @@ namespace WebApplication28.Controllers
     
     public IActionResult Privacy()
         {
-            return View();
+            Product product = new Product { Id = 0, Title = "Product1", Amount = 111 };
+            Category category = new Category { Id=0, Title="Cat1" };
+
+              List<Product> products = new List<Product>() { new Product { Id = 0, Title = "Product1", Amount = 111 },
+              new Product { Id = 1, Title = "Product2", Amount = 222 },
+              new Product { Id = 2, Title = "Product3", Amount = 333 }};
+            PrivscyViewModel pvm = new PrivscyViewModel { ProductVM = products, CategoryVM = category };
+            /*   ViewBag.products = products;
+               ViewBag.product = new Product { Id = 3, Title = "Product4", Amount = 444 };
+               ViewBag.message = "Welcome to my shop";*/
+            return View(pvm);
         }
         public ViewResult ShowAll()
         {
@@ -96,7 +141,10 @@ namespace WebApplication28.Controllers
             double area = altitude * height / 2;
             return Content($"Площадь треугольника с основанием {altitude} и высотой {height} равна {area}");
         }
-
+        private IActionResult SweetAlert(string title, string message, string type)
+        {
+            return Content($"swal ('{title}',  '{message}',  '{type}')", "text/javascript");
+        }
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {

@@ -1,6 +1,13 @@
-﻿@{
+﻿@model WebApplication28.Models.PrivscyViewModel
+@{
     ViewData["Title"] = "Privacy Policy";
 }
-<h1>@ViewData["Title"]</h1>
+<h1>@Model.CategoryVM.Title</h1>
+<ul>
+    @foreach (var item in Model.ProductVM)
+    {
+        <li>@item.Title</li>
+    }
+</ul>
+@*<h1>@ViewBag.product.Title</h1>*@
 
-<p>Use this page to detail your site's privacy policy.</p>
